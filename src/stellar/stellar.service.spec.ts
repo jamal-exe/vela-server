@@ -569,6 +569,21 @@ describe('StellarService', () => {
       });
     });
 
+    it('treats a malformed provider record as a failed, non-confirmed result', async () => {
+      transactionCall.mockResolvedValue({ hash: TX_HASH });
+
+      await expect(
+        service.pollTransactionStatus(TX_HASH, {
+          intervalMs: 0,
+          maxAttempts: 1,
+        }),
+      ).resolves.toEqual({
+        confirmed: false,
+        hash: TX_HASH,
+        failureCode: STELLAR_ERROR.TX_FAILED,
+      });
+    });
+
     it('returns STELLAR_TIMEOUT after bounded not-found polling', async () => {
       transactionCall.mockRejectedValue({ response: { status: 404 } });
 
